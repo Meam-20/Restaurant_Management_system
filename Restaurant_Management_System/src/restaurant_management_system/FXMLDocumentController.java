@@ -1,25 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXML2.java to edit this template
- */
 package restaurant_management_system;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
-/**
- *
- * @author User
- */
 public class FXMLDocumentController implements Initializable {
 
     @FXML
@@ -32,16 +31,81 @@ public class FXMLDocumentController implements Initializable {
     private Button loginbtn;
     @FXML
     private FontAwesomeIcon close;
-    
-    
-   //CLOSE THE PROGRAM
+
+    private Connection connect;
+    private PreparedStatement prepare;
+    private ResultSet result;
+
     @FXML
-    public void close(){
+    public void login() {
+        String user = username.getText();
+        String pass = password.getText();
+
+        Alert alert;
+
+        if (user.isEmpty() || pass.isEmpty()) {
+            alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error Message");
+            alert.setHeaderText(null);
+            alert.setContentText("Please fill in all fields.");
+            alert.showAndWait();
+            return;
+        }
+
+        String sql = "SELECT * FROM admin WHERE username = ? AND password = ?";
+        connect = database.connectDb();
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            prepare.setString(1, user);
+            prepare.setString(2, pass);
+            result = prepare.executeQuery();
+
+            if (result.next()) {
+                alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Login Successful");
+                alert.setHeaderText(null);
+                alert.setContentText("Welcome, " + user + "!");
+                alert.showAndWait();
+
+                // Load Dashboard FXML
+                Parent root = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+                Stage stage = new Stage();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.show();
+
+                // Close login window
+                Stage currentStage = (Stage) loginbtn.getScene().getWindow();
+                currentStage.close();
+
+            } else {
+                alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Login Failed");
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid username or password.");
+                alert.showAndWait();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // CLOSE THE PROGRAM
+    @FXML
+    public void close() {
         System.exit(0);
     }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
-    
+        // Initialization code if needed
+    }
+
+    // Unused close method with event
+    @FXML
+    private void close(ActionEvent event) {
+        System.exit(0);
+    }
 }

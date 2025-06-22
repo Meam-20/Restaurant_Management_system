@@ -19,8 +19,10 @@ public class database {
         try{
             Class.forName("com.mysql.jdbc.Driver");
             //Connect your database
-          //  Connection connect = DriveManager.getConnection("");
-            //return connect;
+          
+         // Connection connect = DriverManager.getConnection("jdbc:mysql://localhost/restaurant","root");
+          Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/restaurant", "root","");
+            return connect;
         }catch (Exception e){e.printStackTrace();
     }
     return null;
