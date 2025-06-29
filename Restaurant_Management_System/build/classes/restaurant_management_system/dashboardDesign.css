@@ -1,0 +1,19 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 29, 2025, 8:56:58 PM
+    Author     : User
+*/
+.top-form{
+    -fx-background-color: #fff;
+    -fx-border-color: #000;
+    -fx-border-width: .4px .4px .2px .4px;
+}
+semi-top{
+    -fx-background-color:#efefef;
+    -fx-border-color:#000;
+    -fx-border-width:.2px .4px .4px .4px;
+    
+}

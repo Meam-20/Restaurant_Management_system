@@ -67,6 +67,9 @@ public class FXMLDocumentController implements Initializable {
                 alert.setHeaderText(null);
                 alert.setContentText("Welcome, " + user + "!");
                 alert.showAndWait();
+                
+                //to hide your login from
+                loginbtn.getScene().getWindow().hide();
 
                 // Link your Dashboard FXML
                 Parent root = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
