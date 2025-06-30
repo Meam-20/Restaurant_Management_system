@@ -7,8 +7,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     Author     : User
 */
 .top-form{
-    -fx-background-color: #fff;
-    -fx-border-color: #000;
+    -fx-background-color: #34A6A8;
+    -fx-border-color: #34A6A8;
     -fx-border-width: .4px .4px .2px .4px;
 }
 semi-top{
@@ -17,3 +17,55 @@ semi-top{
     -fx-border-width:.2px .4px .4px .4px;
     
 }
+.nav1{
+    -fx-background-color:linear-gradient(to bottom right, #25bcbf,#3796a7);
+    -fx-background-radius:5px;
+}
+.nav2{
+    -fx-background-color:#fff;
+    -fx-background-radius:5px;
+}
+.close{
+    -fx-background-color: transparent;
+    -fx-cursor:hand;
+}
+
+.close:hover{
+    -fx-background-color:#eee;
+}
+.minimize{
+    -fx-background-color: transparent;
+    -fx-cursor:hand;
+}
+.minimize:hover{
+    -fx-background-color:#eee;
+}
+.shadow {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 8, 0.0, 0, 0);
+}
+.nav-btn{
+    -fx-background-color:transparent;
+    -fx-font-size: 14px;
+    -fx-font-family: Arial;
+    -fx-cursor:hand;
+    -fx-text-fill:#000;
+    -fx-border-color:#ddd;
+    -fx-border-width: 1px;
+}
+.nav-btn:hover{
+    -fx-background-color:#3796a7;
+     -fx-text-fill:#fff;
+     -fx-border-width: 0px;
+   }
+   .signout{
+       -fx-background-color: #3796a7;
+       -fx-background-radius:5px;
+       -fx-cursor:hand;
+   }
+   .signout:hover{
+       -fx-background-color:#25bcbf;
+   }
+   .white-bg{
+       -fx-background-color: #fff;
+       -fx-background-radius:6px;
+   }
