@@ -72,7 +72,12 @@ public class FXMLDocumentController implements Initializable {
                 loginbtn.getScene().getWindow().hide();
 
                 // Link your Dashboard FXML
+               
+
+
                 Parent root = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+               
+
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
