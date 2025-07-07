@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class FXMLDocumentController implements Initializable {
 
@@ -35,6 +36,9 @@ public class FXMLDocumentController implements Initializable {
     private Connection connect;
     private PreparedStatement prepare;
     private ResultSet result;
+    private double x=0;
+    private double y=0;
+    
 
     @FXML
     public void login() {
@@ -80,6 +84,8 @@ public class FXMLDocumentController implements Initializable {
 
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
+                
+                stage.initStyle(StageStyle.TRANSPARENT);
                 stage.setScene(scene);
                 stage.show();
 

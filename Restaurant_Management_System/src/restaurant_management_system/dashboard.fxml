@@ -18,9 +18,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="restaurant_management_system.DashboardController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="restaurant_management_system.dashboardController">
    <children>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane fx:id="main_form" prefHeight="200.0" prefWidth="200.0">
          <children>
             <BorderPane prefHeight="600.0" prefWidth="1100.0" stylesheets="@dashboardDesign.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <top>
@@ -30,12 +30,12 @@
                            <children>
                               <AnchorPane prefHeight="45.0" prefWidth="1100.0" styleClass="top-form" stylesheets="@dashboardDesign.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button fx:id="close" layoutX="1056.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="44.0" styleClass="top-form" stylesheets="@dashboardDesign.css" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-2.0">
+                                    <Button fx:id="close" layoutX="1056.0" layoutY="-2.0" mnemonicParsing="false" onAction="#close" prefHeight="25.0" prefWidth="44.0" styleClass="top-form" stylesheets="@dashboardDesign.css" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-2.0">
                                        <graphic>
                                           <FontAwesomeIcon glyphName="CLOSE" size="1.2em" text="" />
                                        </graphic>
                                     </Button>
-                                    <Button fx:id="minimize" layoutX="1020.0" layoutY="-1.0" mnemonicParsing="false" prefHeight="14.0" prefWidth="36.0" styleClass="top-form" stylesheets="@dashboardDesign.css">
+                                    <Button fx:id="minimize" layoutX="1020.0" layoutY="-1.0" mnemonicParsing="false" onAction="#minimize" prefHeight="14.0" prefWidth="36.0" styleClass="top-form" stylesheets="@dashboardDesign.css">
                                        <graphic>
                                           <FontAwesomeIcon glyphName="MINUS" />
                                        </graphic>
