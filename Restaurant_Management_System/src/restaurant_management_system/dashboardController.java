@@ -5,28 +5,42 @@
 package restaurant_management_system;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  *
  * @author User
  */
 public class dashboardController implements Initializable {
-     @FXML
+
+    @FXML
     private AnchorPane main_form;
-     
+
     @FXML
     private Button availableFD_addBtn;
 
@@ -161,20 +175,99 @@ public class dashboardController implements Initializable {
 
     @FXML
     private Label username;
-    
+
     //LETS GIVE THEM BEHAVIORS
+    private double x = 0;
+    private double y = 0;
     
-    public void close(){
-            System.exit(0);
+    //AVAILABLE FOODS/DRINKS
+    private String[] status ={"Available", "Not available"};
+    
+    public void availableFDStatus(){
+        List<String> listStatus = new ArrayList<>();
+        
+        for(String data:status){
+            listStatus.add(data);
+        }
+        ObservableList listData = FXCollections.observableArrayList(listStatus);
+        availableFD_productStatus.setItems(listData);
+        
+    }        
+
+    @FXML
+    public void logout() {
+        try {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Message");
+            alert.setHeaderText(null);
+            alert.setContentText("Are you sure you want to logout?");
+
+            Optional<ButtonType> option = alert.showAndWait();
+
+            if (option.get().equals(ButtonType.OK)) {
+                // Perform logout logic here
+                
+                logout.getScene().getWindow().hide();
+                
+                Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+                Stage stage = new Stage();
+                Scene scene = new Scene(root);
+
+                stage.initStyle(StageStyle.TRANSPARENT);
+
+                
+                root.setOnMousePressed((MouseEvent event) -> {
+                 x = event.getSceneX();
+                 y = event.getSceneY();
+               });
+
+               root.setOnMouseDragged((MouseEvent event) -> {
+                   stage.setX(event.getScreenX() - x);
+                   stage.setY(event.getScreenY() - y);
+                   stage.setOpacity(0.8);
+               });
+
+               root.setOnMouseReleased((MouseEvent event) -> {
+                   stage.setOpacity(1);
+               });
+
+                       stage.setScene(scene);
+                       stage.show();
+                   }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+                    }
+
+        }
+
+
+    
+
+    public void displayUsername() {
+        String user = data.username;
+        user = user.substring(0, 1).toUpperCase() + user.substring(1);
+        username.setText(user);
     }
-    public void minimize(){
-        Stage stage=(Stage)main_form.getScene().getWindow();
+
+    @FXML
+    public void close() {
+        System.exit(0);
+    }
+
+    @FXML
+    public void minimize() {
+        Stage stage = (Stage) main_form.getScene().getWindow();
         stage.setIconified(true);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+
+        displayUsername();
+        availableFDStatus();
+
     }
-    
+
 }
+

@@ -16,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -36,6 +37,7 @@ public class FXMLDocumentController implements Initializable {
     private Connection connect;
     private PreparedStatement prepare;
     private ResultSet result;
+    
     private double x=0;
     private double y=0;
     
@@ -45,17 +47,6 @@ public class FXMLDocumentController implements Initializable {
         String user = username.getText();
         String pass = password.getText();
 
-        Alert alert;
-
-        if (user.isEmpty() || pass.isEmpty()) {
-            alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error Message");
-            alert.setHeaderText(null);
-            alert.setContentText("Please fill in all fields.");
-            alert.showAndWait();
-            return;
-        }
-
         String sql = "SELECT * FROM admin WHERE username = ? AND password = ?";
         connect = database.connectDb();
 
@@ -64,8 +55,22 @@ public class FXMLDocumentController implements Initializable {
             prepare.setString(1, user);
             prepare.setString(2, pass);
             result = prepare.executeQuery();
+            
+            Alert alert;
 
-            if (result.next()) {
+                if (username.getText().isEmpty() || password.getText().isEmpty()) {
+             alert = new Alert(Alert.AlertType.ERROR);
+             alert.setTitle("Error Message");
+             alert.setHeaderText(null);
+             alert.setContentText("Please fill in all fields.");
+             alert.showAndWait();
+             return;
+         }else
+
+                if (result.next()) {
+                    
+                 data.username = username.getText();   
+                
                 alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Login Successful");
                 alert.setHeaderText(null);
@@ -80,10 +85,23 @@ public class FXMLDocumentController implements Initializable {
 
 
                 Parent root = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+                
+                
+                
                
-
+                             
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
+                
+                root.setOnMousePressed((MouseEvent event) ->{
+                    x=event.getSceneX();
+                    y=event.getSceneY();
+                });
+                root.setOnMouseDragged((MouseEvent event) ->{
+                    stage.setX(event.getScreenX() - x);
+                    stage.setY(event.getScreenX() - y);
+                    
+                });
                 
                 stage.initStyle(StageStyle.TRANSPARENT);
                 stage.setScene(scene);
