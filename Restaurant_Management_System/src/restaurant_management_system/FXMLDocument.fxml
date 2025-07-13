@@ -32,7 +32,7 @@
             <AnchorPane layoutX="300.0" prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: #35BABD;" stylesheets="@loginDesign.css">
                <children>
                   <Button layoutX="282.0" layoutY="2.0" mnemonicParsing="false" onAction="#close" prefHeight="21.0" prefWidth="36.0" style="-fx-background-color: #35BABD;" textFill="#62c8e8" />
-                  <FontAwesomeIcon fx:id="close" glyphName="CLOSE" layoutX="293.0" layoutY="20.0" text="" wrappingWidth="14.428571701049805" />
+                  <FontAwesomeIcon fx:id="close" glyphName="CLOSE" layoutX="297.0" layoutY="18.0" text="" wrappingWidth="14.428571701049805" />
                   <FontAwesomeIcon fill="WHITE" glyphName="BUILDING" layoutX="95.0" layoutY="154.0" size="10em" />
                   <Label layoutX="30.0" layoutY="181.0" prefHeight="17.0" prefWidth="284.0" text="Restaurant Management System" textFill="WHITE">
                      <font>

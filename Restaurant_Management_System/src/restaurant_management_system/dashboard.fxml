@@ -86,9 +86,9 @@
                               <String fx:value="shadow" />
                            </styleClass>
                            <children>
-                              <Button fx:id="dashboard_btn" layoutX="9.0" layoutY="23.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@dashboardDesign.css" text="Dashboard" />
-                              <Button fx:id="availableFD_btn" layoutX="7.0" layoutY="70.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@dashboardDesign.css" text="Available Food/Drinks" />
-                              <Button fx:id="order_btn" layoutX="9.0" layoutY="116.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@dashboardDesign.css" text="Order" />
+                              <Button fx:id="dashboard_btn" layoutX="9.0" layoutY="23.0" mnemonicParsing="false" onAction="#swichForm" prefHeight="40.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@dashboardDesign.css" text="Dashboard" />
+                              <Button fx:id="availableFD_btn" layoutX="7.0" layoutY="70.0" mnemonicParsing="false" onAction="#swichForm" prefHeight="40.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@dashboardDesign.css" text="Available Food/Drinks" />
+                              <Button fx:id="order_btn" layoutX="9.0" layoutY="116.0" mnemonicParsing="false" onAction="#swichForm" prefHeight="40.0" prefWidth="180.0" styleClass="nav-btn" stylesheets="@dashboardDesign.css" text="Order" />
                               <Button fx:id="logout" layoutX="15.0" layoutY="312.0" mnemonicParsing="false" onAction="#logout" prefHeight="30.0" prefWidth="42.0" styleClass="signout" stylesheets="@dashboardDesign.css" />
                               <FontAwesomeIcon fill="#fffbfb" glyphName="SIGN_OUT" layoutX="25.0" layoutY="335.0" size="2em" />
                               <Label layoutX="71.0" layoutY="317.0" prefHeight="17.0" prefWidth="70.0" text="Sign Out">
