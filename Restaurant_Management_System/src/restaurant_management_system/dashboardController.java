@@ -5,8 +5,9 @@
 package restaurant_management_system;
 
 import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.net.URL;
 import java.util.ArrayList;
 import static java.util.Collections.list;
@@ -32,11 +33,15 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+
+import java.sql.ResultSet;
 
 /**
  *
@@ -55,21 +60,24 @@ public class dashboardController implements Initializable {
 
     @FXML
     private Button availableFD_clearBtn;
+    
+     @FXML
+    private TableView<catagories> availableFD_tableView;
 
     @FXML
-    private TableColumn<?, ?> availableFD_col_price;
+    private TableColumn<catagories, String> availableFD_col_price;
 
     @FXML
-    private TableColumn<?, ?> availableFD_col_productID;
+    private TableColumn<catagories, String> availableFD_col_productID;
 
     @FXML
-    private TableColumn<?, ?> availableFD_col_productName;
+    private TableColumn<catagories, String> availableFD_col_productName;
 
     @FXML
-    private TableColumn<?, ?> availableFD_col_status;
+    private TableColumn<catagories, String> availableFD_col_status;
 
     @FXML
-    private TableColumn<?, ?> availableFD_col_type;
+    private TableColumn<catagories, String> availableFD_col_type;
 
     @FXML
     private Button availableFD_deleteBtn;
@@ -182,104 +190,132 @@ public class dashboardController implements Initializable {
     @FXML
     private Label username;
     
-    
-    private Connection connect;
+//     private ResultSet result;
+   private Connection connect;
     private PreparedStatement prepare;
     private Statement statement;
     private ResultSet result;
 
     
-    public void availableFDAdd(){
-        String sql = "INSERT INTO catagory (product_id,product_name,type,price,status)"
-                +"VALUES(?,?,?,?,?)";
-            connect = database.connectDb();
-            
-            try{
-                
-                prepare.setString(1, availableFD_productID.getText());
-                prepare.setString(2, availableFD_productName.getText());
-                prepare.setString(3, (String) availableFD_productType.getSelectionModel().getSelectedItem());
-                prepare.setString(4, availableFD_productPrice.getText());
-                prepare.setString(5, (String) availableFD_productStatus.getSelectionModel().getSelectedItem());
-                
-                if(availableFD_productID.getText().isEmpty() 
-                        ||availableFD_productName.getText().isEmpty()
-                        ||availableFD_productType.getSelectionModel() == null
-                        ||availableFD_productPrice.getText().isEmpty()
-                        || availableFD_productStatus.getSelectionModel() == null){
-                    
+
+    
+    @FXML
+       public void availableFDAdd() {
+
+        String sql = "INSERT INTO catagory (product_id, product_name, type, price, status) "
+                + "VALUES(?,?,?,?,?)";
+
+          connect = (Connection) database.connectDb();
+
+        try {
+           prepare = connect.prepareStatement(sql);
+           
+            prepare.setString(1, availableFD_productID.getText());
+            prepare.setString(2, availableFD_productName.getText());
+            prepare.setString(3, (String) availableFD_productType.getSelectionModel().getSelectedItem());
+            prepare.setString(4, availableFD_productPrice.getText());
+            prepare.setString(5, (String) availableFD_productStatus.getSelectionModel().getSelectedItem());
+ 
+            Alert alert;
+
+            if (availableFD_productID.getText().isEmpty()
+                    || availableFD_productName.getText().isEmpty()
+                    || availableFD_productType.getSelectionModel() == null
+                    || availableFD_productPrice.getText().isEmpty()
+                    || availableFD_productStatus.getSelectionModel() == null) {
+
+                alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Please fill all blank fields");
+                alert.showAndWait();
+
+            } else {
+
+                String checkData = "SELECT product_id FROM catagory WHERE product_id = '"
+                        + availableFD_productID.getText() + "'";
+
+                 connect = (Connection) database.connectDb();
+
+                statement = connect.createStatement();
+                result = statement.executeQuery(checkData);
+
+                if (result.next()) {
                     alert = new Alert(AlertType.ERROR);
                     alert.setTitle("Error Message");
                     alert.setHeaderText(null);
-                    alert.setContentText("Please fill all blank fields");
+                    alert.setContentText("Product ID: " + availableFD_productID.getText() + " is already exist!");
                     alert.showAndWait();
-                }else
-                    
-                    String checkData = "SELECT product_id FROM catagory WHERE product_id ='"
-                            +availableFD_productID.getText()+"'";
-                
-                            connect = database.connectDb();
-                            statement = connect.createStatement();
-                            result = statement.executeQuery(checkData);
-                            
-                            if(result.next()){
-                                    alert = new Alert(AlertType.ERROR);
-                                    alert.setTitle("Error Message");
-                                    alert.setHeaderText(null);
-                                    alert.setContentText("Product ID :" + availableFD_productID.getText() +"is already exists!" );
-                                    alert.showAndWait();
-                                
-                            }else{
+                } else {
+                    prepare.executeUpdate();
 
+                    alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Information Message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Successfully Added!");
+                    alert.showAndWait();
 
-                            prepare.executeQuery();
-                            
-                            alert = new Alert(AlertType.IMFORMATION);
-                                    alert.setTitle("Information Message");
-                                    alert.setHeaderText(null);
-                                    alert.setContentText("Successfully Added!" );
-                                    alert.showAndWait();
-                                    
-                            }
-                
+                    // TO SHOW THE DATA
+                    availableFDShowData();
+                    // TO CLEAR THE FIELDS
+                //    availableFDClear();
 
-            }catch(exception e)(e.printStackTrace());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-            
-            
-    
-    public ObservableList<catagories> availableFDListData(){
-        ObservableList<catagories> listData = FXCollections.observableArrayList();
+    public void availableFDclear(){
         
-        String sql = "SELECT FROM catagory";
-         connect = database.connectDb();
-         try{
-             prepare = connect.prepareStatement(sql);
-             result = statement.executeQuery();
-             catagories cat;
-             
-             while(result.next()){
-                 cat = new catagories(result.getString("product_id"))
-                         , (result.getString("product_name")
-                         ,(result.getstring("type"),(result.getstring("price"),
-                         (result.getstring("status");
-                         
-                     listData.add(cat);    
-             }
-             
-         }catch(exception e){e.printStackTrace();
+         availableFD_productID.setText("");
+         availableFD_productName.setText("");
+         availableFD_productType.getSelectionModel().clearSelection();
+         availableFD_productPrice.setText("");
+         availableFD_productStatus.getSelectionModel().clearSelection();
+         
     }
-    return listData;
+            
+           
+    
+      public ObservableList<catagories> availableFDListData() {
+
+        ObservableList<catagories> listData = FXCollections.observableArrayList();
+
+        String sql = "SELECT * FROM catagory";
+
+         connect = (Connection) database.connectDb();
+
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            catagories cat;
+
+            while (result.next()) {
+                cat = new catagories(result.getString("product_id"),
+                        result.getString("product_name"), result.getString("type"),
+                        result.getDouble("price"), result.getString("status"));
+
+                listData.add(cat);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listData;
     }
      public ObservableList<catagories> availableFDList;
      public void availableFDShowData(){
          availableFDList = availableFDListData();
-         availableFD_col_productID.setCellValueFactory (new propertyValueFactory<>("productId"));
-         availableFD_col_productName.setCellValueFactory (new propertyValueFactory<>("name"));
-         availableFD_col_type.setCellValueFactory (new propertyValueFactory<>("type"));
-         availableFD_col_price.setCellValueFactory (new propertyValueFactory<>("price"));
-         availableFD_col_status.setCellValueFactory (new propertyValueFactory<>("status"));
+         availableFD_col_productID.setCellValueFactory (new PropertyValueFactory<>("productId"));
+         availableFD_col_productName.setCellValueFactory (new PropertyValueFactory<>("name"));
+         availableFD_col_type.setCellValueFactory (new PropertyValueFactory<>("type"));
+         availableFD_col_price.setCellValueFactory (new PropertyValueFactory<>("price"));
+         availableFD_col_status.setCellValueFactory (new PropertyValueFactory<>("status"));
          
+         availableFD_tableView.setItems(availableFDList);
          
      }
     
@@ -336,6 +372,8 @@ public void swichForm(ActionEvent event) {
         availableFD_btn.setStyle("-fx-background-color:#3796a7;-fx-text-fill:#fff;-fx-border-width: 0px;");
         dashboard_btn.setStyle("-fx-background-color:transparent;-fx-border-width: 1px;-fx-text-fill:#000;");
         order_btn.setStyle("-fx-background-color:transparent;-fx-border-width: 1px;-fx-text-fill:#000;");
+        
+         availableFDShowData();
 
     } else if (event.getSource() == order_btn) {
         dashborad_form.setVisible(false);
@@ -421,12 +459,14 @@ public void swichForm(ActionEvent event) {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        
+        
 
         displayUsername();
         availableFDStatus();
         availableFDtype();
+         availableFDShowData();
 
     }
 
 }
-

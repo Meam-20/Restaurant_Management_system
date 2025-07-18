@@ -4,46 +4,48 @@
  */
 package restaurant_management_system;
 
-/**
- *
- * @author User
- */
 public class catagories {
+
     private String productId;
     private String name;
     private String type;
     private Double price;
     private String status;
 
-    
-    public catagories(String productID,String Name,String type,Double price,String status){
-        
-        this.productId= productId;
+    public catagories(String productId, String name, String type, Double price, String status) {
+        this.productId = productId;
         this.name = name;
-        this.type= type;
-        this.price= price;
-        this.status= status;
-        
+        this.type = type;
+        this.price = price;
+        this.status = status;
     }
-    
-    public String getProductId(){
-        
+
+    // Getters and setters
+    public String getProductId() {
         return productId;
     }
-     public String getName(){
-         
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getName() {
         return name;
     }
-     public String getType(){
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
         return type;
     }
-     public Double getPrice(){
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Double getPrice() {
         return price;
     }
-     public String getStatus(){
-         return status;
-        
-     }
-    
-    
 }
