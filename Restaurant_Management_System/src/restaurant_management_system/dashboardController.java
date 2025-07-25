@@ -153,19 +153,19 @@ public class dashboardController implements Initializable {
     private Button order_btn;
 
     @FXML
-    private TableColumn<?, ?> order_col_price;
+    private TableColumn<product, String> order_col_price;
 
     @FXML
-    private TableColumn<?, ?> order_col_productID;
+    private TableColumn<product, String> order_col_productID;
 
     @FXML
-    private TableColumn<?, ?> order_col_productName;
+    private TableColumn<product, String> order_col_productName;
 
     @FXML
-    private TableColumn<?, ?> order_col_quantity;
+    private TableColumn<product, String> order_col_quantity;
 
     @FXML
-    private TableColumn<?, ?> order_col_type;
+    private TableColumn<product, String> order_col_type;
 
     @FXML
     private AnchorPane order_form;
@@ -189,7 +189,7 @@ public class dashboardController implements Initializable {
     private Button order_removeBtn;
 
     @FXML
-    private TableView<?> order_tableview;
+    private TableView<product> order_tableview;
 
     @FXML
     private Label order_total;
@@ -197,12 +197,86 @@ public class dashboardController implements Initializable {
     @FXML
     private Label username;
     
-//     private ResultSet result;
+//  private ResultSet result;
    private Connection connect;
     private PreparedStatement prepare;
     private Statement statement;
     private ResultSet result;
+    @FXML
+    private Label order_balance;
+    
+    
+    public void dashboard_NC(){
+         String sql = "SELECT COUNT(id) FROM product_info";
 
+        int nc = 0;
+
+        connect = (Connection) database.connectDb();
+
+        try {
+            
+            statement = connect.createStatement();
+            result = statement.executeQuery(sql);
+            
+            if(result.next()){
+                 nc = result.getInt("COUNT(id)");
+            }
+              dashboard_NC.setText(String.valueOf(nc));
+            
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void dashboard_TI(){
+         Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+        String sql = "SELECT SUM(total) FROM product_info WHERE date = '" + sqlDate + "'";
+
+        connect = (Connection) database.connectDb();
+        double ti = 0;
+
+        try {
+            statement = connect.createStatement();
+            result = statement.executeQuery(sql);
+
+            if (result.next()) {
+                ti = result.getDouble("SUM(total)");
+            }
+
+            dashboard_TI.setText("$" + String.valueOf(ti));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+         
+    }
+   
+    
+    public void dashboard_TIncome(){
+        
+         String sql = "SELECT SUM(total) FROM product_info";
+
+           connect = (Connection) database.connectDb();
+
+        double ti = 0;
+
+        try {
+
+            statement = connect.createStatement();
+            result = statement.executeQuery(sql);
+
+            if (result.next()) {
+                ti = result.getDouble("SUM(total)");
+            }
+            dashboard_TIncome.setText("$" + String.valueOf(ti));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        
+    }
     
     @FXML
        public void availableFDAdd() {
@@ -329,9 +403,6 @@ public class dashboardController implements Initializable {
                                  
                     }
              }
-                 
-             
-             
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -476,7 +547,7 @@ public class dashboardController implements Initializable {
      public void availableFDShowData(){
          availableFDList = availableFDListData();
          availableFD_col_productID.setCellValueFactory (new PropertyValueFactory<>("productId"));
-         availableFD_col_productName.setCellValueFactory (new PropertyValueFactory<>("name"));
+         availableFD_col_productName.setCellValueFactory (new PropertyValueFactory<>("product_name"));
          availableFD_col_type.setCellValueFactory (new PropertyValueFactory<>("type"));
          availableFD_col_price.setCellValueFactory (new PropertyValueFactory<>("price"));
          availableFD_col_status.setCellValueFactory (new PropertyValueFactory<>("status"));
@@ -534,12 +605,13 @@ public class dashboardController implements Initializable {
     } 
     
     
+    @FXML
     public void orderAdd(){
         orderCustomerId();
           orderTotal();
-        String sql = "INSERT INTO product"
+        String sql = "INSERT INTO product "
                + ("customer_id,product_id,product_name,type,price,quantity,date")
-                +"VALUES(?,?,?,?,?,?)";
+                +"VALUES(?,?,?,?,?,?,?)";
         
          connect = (Connection) database.connectDb();
          try{
@@ -556,13 +628,15 @@ public class dashboardController implements Initializable {
             }
              
              
-             String checkData = "SELECT* FROM catagory  WHERE product_id = '"+
+             String checkData = "SELECT * FROM catagory  WHERE product_id = '"+
                     order_productID.getSelectionModel().getSelectedItem()+"'"; 
              prepare = connect.prepareStatement(sql);
              prepare.setString(1,String.valueOf(customerId));
              prepare.setString(2,(String)order_productID.getSelectionModel().getSelectedItem());
              prepare.setString(3,(String)order_productName.getSelectionModel().getSelectedItem());
               prepare.setString(4,orderType);
+              
+              double totalPrice = orderPrice *qty;
               prepare.setString(5, String.valueOf(orderPrice));
               prepare.setString(6,String.valueOf(qty));
               
@@ -575,25 +649,83 @@ public class dashboardController implements Initializable {
               
               prepare.setString(7,String.valueOf(sqlDate));
               prepare.executeUpdate();
-            
               
-              String insertInfo =("INSERT into product info(customer_id,total,date");
-             
-              prepare = connect.prepareStatement(insertInfo);
-              prepare.setString(1,String.valueOf(customerId));
-              prepare.setString(2,String .valueOf( total1p));
-               prepare.setString(3,String .valueOf( sqlDate));
-               
-               orderListdata();
+              orderTotal();
+             orderDisplayTotal();
+               orderDisplayData();
         
          }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+     
+    @FXML
+    public void order_payBtn(){
+        String sql = "INSERT INTO product_info (customer_id, total, date) VALUES(?,?,?)";
+
+        connect = (Connection) database.connectDb();
+
+        try {
+             Alert alert;
+                if (balance == 0 || String.valueOf(balance) == "$0.0" || String.valueOf(balance) == null
+                    ||total1p== 0 || String.valueOf(total1p) == "$0.0" || String.valueOf(total1p) == null) {
+                alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid :3");
+                alert.showAndWait();
+            }else{
+                    
+                    alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("CONFIRMATION Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Are you sure?");
+                alert.showAndWait();
+                Optional<ButtonType> option = alert.showAndWait();
+                
+                if (option.get().equals(ButtonType.OK)){
+                    
+                       prepare = connect.prepareStatement(sql);
+                       prepare.setString(1, String.valueOf(customerId));
+                       prepare.setString(2, String.valueOf( total1p ));
+
+                       Date date =new Date();
+                       java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+                       prepare.setString(3, String.valueOf( sqlDate ));
+
+                       prepare.executeUpdate();
+                       
+                      
+                        alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Information Message");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Successful!");
+                        alert.showAndWait();
+
+                       order_total.setText("$0.0");
+                       order_balance.setText("$0.0");
+                       order_amount.setText(" ");  
+                }else{
+                        alert = new Alert(AlertType.ERROR);
+                        alert.setTitle("Information Message");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Cancelled!");
+                        alert.showAndWait();
+                }
+                
+                
+                }
+              
+
+    }catch (Exception e) {
             e.printStackTrace();
         }
     }
     
     private double total1p = 0;
     public void orderTotal(){
-        String sql = "SELECT* FROM product WHERE customer_id = " + customerId;
+        String sql = "SELECT * SUM(price) FROM product WHERE customer_id = " + customerId;
          connect = (Connection) database.connectDb();
 
         try {
@@ -602,43 +734,158 @@ public class dashboardController implements Initializable {
             
           if(result.next()){
               total1p = result.getDouble("SUM(price)");
-               
             }
+          orderDisplayTotal();
+         
     }catch (Exception e) {
             e.printStackTrace();
         }
-    
-    
-   public ObservableList<product> orderListdata() {
-
-    orderCustomerId();
-        
-        ObservableList<product>listData = FXCollections.observableArrayList();
-        
-      String sql = "SELECT * FROM product WHERE customer_id=" + customerId+ "'";
-
-                try{
-                    prepare=connect.prepareStatement(sql);
-                    result = prepare.executeQuery();
-                    
-                    product prod;
-                    while (result.next()) {
-                             prod = new product(
-                            result.getString("product_id"),
-                            result.getString("product_name"),
-                            result.getString("type"),
-                            result.getDouble("price"),
-                            result.getInt("quantity")
-                        );
-                         listData.add(prod); 
-                    }
-                    
-                }catch (Exception e) {
-            e.printStackTrace();
-        }
-             return listData;
-
     }
+        
+        private double amount;
+        private double balance;
+    @FXML
+        public void order_amount(){
+            Alert alert;
+            
+            if(order_amount.getText().isEmpty()|| order_amount.getText() == null ||order_amount.getText()==""){
+                alert = new Alert(AlertType.ERROR);
+                alert.setHeaderText(null);
+                alert.setContentText("Please type the amount!");
+                alert.showAndWait();
+            }else{
+                amount = Double.parseDouble(order_amount.getText());
+                
+                if(amount < total1p){
+                    order_amount.setText("");
+                  
+                }else{
+                    balance = ( amount-total1p);
+                    order_balance.setText("$"+String.valueOf(order_balance));
+                }
+            }
+                    
+                    
+        }
+    
+    public void orderDisplayTotal(){
+        order_total.setText("$"+String.valueOf(total1p));
+        
+    }
+            public ObservableList<product> orderListdata() {
+              orderCustomerId(); // make sure this sets the `customerId` variable
+
+              ObservableList<product> listData = FXCollections.observableArrayList();
+              String sql = "SELECT * FROM product WHERE customer_id='" + customerId + "'";
+
+              try {
+                  prepare = connect.prepareStatement(sql);
+                  result = prepare.executeQuery();
+
+                  product prod;
+                  while (result.next()) {
+                      prod = new product(result.getInt("id"),
+                          result.getString("product_id"),
+                          result.getString("product_name"),
+                          result.getString("type"),
+                          result.getDouble("price"),
+                          result.getInt("quantity")
+                      );
+                      listData.add(prod);
+                  }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     } catch (Exception e) {
+                  e.printStackTrace();
+              }
+
+              return listData;
+          }
+            
+            //LETS CREATE OUR RECEIPT:
+    @FXML
+            public void order_removeBtn(){
+                
+            String sql = "DELETE FROM product WHERE id = " + item;
+
+            connect = (Connection) database.connectDb();
+
+            try {
+                Alert alert;
+                if (item == 0 || String.valueOf(item) == null || String.valueOf(item) == "") {
+                alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select the item first");
+                alert.showAndWait();
+            }else{
+                    alert = new Alert(AlertType.CONFIRMATION);
+                    alert.setTitle("Confirmation Message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Are you sure you want to Remove Item: " + item + "?");
+                    Optional<ButtonType> option = alert.showAndWait();
+                    
+                    if (option.get().equals(ButtonType.OK)) {
+                    statement = connect.createStatement();
+                    statement.executeUpdate(sql);
+                    
+                    alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Information Message");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Successfully Removed!");
+                    alert.showAndWait();
+
+                    orderDisplayData();
+                    orderDisplayTotal();
+                    
+                    order_total.setText("$0.0");
+                    order_amount.setText("");
+                    order_balance.setText("$0.0");
+                    
+                    } else{
+                        alert = new Alert(AlertType.ERROR);
+                        alert.setTitle("Information Message");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Cancelled!");
+                        alert.showAndWait();
+                    }
+                }
+            }catch (Exception e) {
+                  e.printStackTrace();
+               
+                }
+              }
+
+            
+            
+            private int item;
+    @FXML
+            public void orderSelectData(){
+                    product prod =  order_tableview.getSelectionModel().getSelectedItem();
+                    int num =  order_tableview.getSelectionModel().getSelectedIndex();
+
+                    if ((num - 1) < -1) {
+                        return;
+                    }
+
+                    item = prod.getId();
+                
+            }
+
+        private ObservableList<product> orderData;
+
+      public void orderDisplayData() {
+          orderData = orderListdata(); // populate the list from your method
+
+          order_col_productID.setCellValueFactory(new PropertyValueFactory<>("product_id"));
+          order_col_productName.setCellValueFactory(new PropertyValueFactory<>("name"));
+          order_col_type.setCellValueFactory(new PropertyValueFactory<>("type"));
+          order_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+          order_col_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+          // Set the ObservableList to the TableView
+          order_tableview.setItems(orderData);
+      }
+
     private int customerId;
     public void orderCustomerId(){
          String sql = "SELECT customer_id FROM product";
@@ -681,7 +928,7 @@ public class dashboardController implements Initializable {
     
     @FXML
     public void orderProductId(){
-      String sql = "SELECT product_id FROM catagory WHERE STATUS = 'Available'";
+      String sql = "SELECT product_id FROM catagory WHERE STATUS = 'Available' ";
 
         connect = (Connection) database.connectDb();
 
@@ -703,7 +950,8 @@ public class dashboardController implements Initializable {
     
     @FXML
         public void oderProductName(){
-            String sql = "SELECT*  product_name FROM catagory WHERE STATUS = 'Available'";
+            String sql = "SELECT product_name FROM catagory WHERE product_id = '"
+                + order_productID.getSelectionModel().getSelectedItem() + "'";
             connect = (Connection) database.connectDb();
 
         try {
@@ -711,7 +959,7 @@ public class dashboardController implements Initializable {
             result = prepare.executeQuery(); 
             ObservableList listData = FXCollections.observableArrayList();
             while(result.next()){
-                listData.add(result.getString("product_id"));
+                listData.add(result.getString("product_name"));
                
             }
                     
@@ -747,6 +995,10 @@ public void swichForm(ActionEvent event) {
         dashboard_btn.setStyle("-fx-background-color:#3796a7;-fx-text-fill:#fff;-fx-border-width: 0px;");
         availableFD_btn.setStyle("-fx-background-color:transparent;-fx-border-width: 1px;-fx-text-fill:#000;");
         order_btn.setStyle("-fx-background-color:transparent;-fx-border-width: 1px;-fx-text-fill:#000;");
+        
+        dashboard_NC();
+        dashboard_TI();
+        dashboard_TIncome();
 
     } else if (event.getSource() == availableFD_btn) {
         dashborad_form.setVisible(false);
@@ -771,6 +1023,9 @@ public void swichForm(ActionEvent event) {
         availableFD_btn.setStyle("-fx-background-color:transparent;-fx-border-width: 1px;-fx-text-fill:#000;");
         orderProductId();
         oderProductName();
+        orderSpinner();
+       orderDisplayData();
+        
     }
 }
 
@@ -848,15 +1103,19 @@ public void swichForm(ActionEvent event) {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         
-        
+        dashboard_NC();
+        dashboard_TI();
+        dashboard_TIncome();
 
         displayUsername();
         availableFDStatus();
         availableFDtype();
         availableFDShowData();
         orderProductId();
-       oderProductName();
-       orderSpinner();
+        oderProductName();
+        orderSpinner();
+        orderDisplayData();
+        orderDisplayTotal();
       
 
     }
