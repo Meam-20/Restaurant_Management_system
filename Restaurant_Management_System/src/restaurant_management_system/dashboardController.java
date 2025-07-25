@@ -48,6 +48,8 @@ import java.sql.ResultSet;
 import java.util.Date;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.SpinnerValueFactory;
 
 /**
@@ -117,7 +119,7 @@ public class dashboardController implements Initializable {
     private Button close;
 
     @FXML
-    private BarChart<?, ?> dashboard_ICChart;
+    private AreaChart<?, ?> dashboard_ICChart;
 
     @FXML
     private Label dashboard_NC;
@@ -278,10 +280,62 @@ public class dashboardController implements Initializable {
         
     }
     
+    public void dashboard_NOChart(){
+            try {
+
+             dashboard_NOChart.getData().clear();
+
+            String sql = "SELECT date, COUNT(id) FROM product_info GROUP BY date ORDER BY TIMESTAMP(date) ASC LIMIT 5";
+
+            connect = (Connection) database.connectDb();
+
+            XYChart.Series chart = new XYChart.Series();
+
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+                chart.getData().add(new XYChart.Data(result.getString(1), result.getInt(2)));
+            }
+
+           dashboard_NOChart.getData().add(chart);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void dashboard_ICChart(){
+        
+        dashboard_ICChart.getData().clear();
+
+        String sql = "SELECT date, SUM(total) FROM product_info GROUP BY date ORDER BY TIMESTAMP(total) ASC LIMIT 7";
+
+       connect = (Connection) database.connectDb();
+        try {
+
+            XYChart.Series chart = new XYChart.Series();
+
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            while (result.next()) {
+
+                chart.getData().add(new XYChart.Data(result.getString(1), result.getDouble(2)));
+
+            }
+
+            dashboard_ICChart.getData().add(chart);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
     @FXML
        public void availableFDAdd() {
 
-        String sql = "INSERT INTO catagory (product_id, product_name, type, price, status) "
+        String sql = "INSERT INTO category (product_id, product_name, type, price, status) "
                 + "VALUES(?,?,?,?,?)";
 
           connect = (Connection) database.connectDb();
@@ -311,7 +365,7 @@ public class dashboardController implements Initializable {
 
             } else {
 
-                String checkData = "SELECT product_id FROM catagory WHERE product_id = '"
+                      String checkData = "SELECT product_id FROM catagory WHERE product_id = '"
                         + availableFD_productID.getText() + "'";
 
                  connect = (Connection) database.connectDb();
@@ -335,9 +389,9 @@ public class dashboardController implements Initializable {
                     alert.showAndWait();
 
                     // TO SHOW THE DATA
-                    //availableFDShowData();
+                    availableFDShowData();
                     // TO CLEAR THE FIELDS
-                     //availableFDClear();
+                    availableFDclear();
 
                 }
             }
@@ -390,7 +444,7 @@ public class dashboardController implements Initializable {
                                  // TO SHOW THE DATA
                                 availableFDShowData();
                                 // TO CLEAR THE FIELDS
-                                  //availableFDClear();
+                                 availableFDclear();
                        
                     }
                     else{
@@ -447,7 +501,7 @@ public class dashboardController implements Initializable {
                                  // TO SHOW THE DATA
                                 availableFDShowData();
                                 // TO CLEAR THE FIELDS
-                                  //availableFDClear();
+                                  availableFDclear();
                        
                     }
                     else{
@@ -547,7 +601,7 @@ public class dashboardController implements Initializable {
      public void availableFDShowData(){
          availableFDList = availableFDListData();
          availableFD_col_productID.setCellValueFactory (new PropertyValueFactory<>("productId"));
-         availableFD_col_productName.setCellValueFactory (new PropertyValueFactory<>("product_name"));
+         availableFD_col_productName.setCellValueFactory (new PropertyValueFactory<>("name"));
          availableFD_col_type.setCellValueFactory (new PropertyValueFactory<>("type"));
          availableFD_col_price.setCellValueFactory (new PropertyValueFactory<>("price"));
          availableFD_col_status.setCellValueFactory (new PropertyValueFactory<>("status"));
@@ -555,6 +609,23 @@ public class dashboardController implements Initializable {
          availableFD_tableView.setItems(availableFDList);
          
      }
+     @FXML
+    public void availableFDSelect(){
+        catagories catData = availableFD_tableView.getSelectionModel().getSelectedItem();
+        
+        int num = availableFD_tableView.getSelectionModel().getSelectedIndex();
+        
+        if((num - 1)<-1)
+        {
+            return;
+        
+        }
+    
+        availableFD_productID.setText(catData.getProductId());
+        availableFD_productName.setText(catData.getName());
+         availableFD_productPrice.setText(String.valueOf(catData.getPrice()));
+        
+    }
     
     //AVAILABLE food/drinks
     private String[] categories = {"Meals", "Drinks"};
@@ -572,23 +643,7 @@ public class dashboardController implements Initializable {
     }
 
     
-    @FXML
-    public void availableFDSelect(){
-        catagories catData = availableFD_tableView.getSelectionModel().getSelectedItem();
-        
-        int num = availableFD_tableView.getSelectionModel().getSelectedIndex();
-        
-        if((num - 1)<-1)
-        {
-            return;
-        
-        }
     
-        availableFD_productID.setText(catData.getProductId());
-        availableFD_productName.setText(catData.getName());
-         availableFD_productPrice.setText(String.valueOf(catData.getPrice()));
-        
-    }
     
     //AVAILABLE FOODS/DRINKS
     private String[] status ={"Available", "Not available"};
@@ -772,34 +827,41 @@ public class dashboardController implements Initializable {
         order_total.setText("$"+String.valueOf(total1p));
         
     }
-            public ObservableList<product> orderListdata() {
-              orderCustomerId(); // make sure this sets the `customerId` variable
+    
+   
 
-              ObservableList<product> listData = FXCollections.observableArrayList();
-              String sql = "SELECT * FROM product WHERE customer_id='" + customerId + "'";
+   public ObservableList<product> orderListData() {
 
-              try {
-                  prepare = connect.prepareStatement(sql);
-                  result = prepare.executeQuery();
+     orderCustomerId();
 
-                  product prod;
-                  while (result.next()) {
-                      prod = new product(result.getInt("id"),
-                          result.getString("product_id"),
-                          result.getString("product_name"),
-                          result.getString("type"),
-                          result.getDouble("price"),
-                          result.getInt("quantity")
-                      );
-                      listData.add(prod);
-                  }
+     ObservableList<product> listData = FXCollections.observableArrayList();
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     } catch (Exception e) {
-                  e.printStackTrace();
-              }
+     String sql = "SELECT * FROM product WHERE customer_id = " + customerId;
 
-              return listData;
-          }
+    connect = (Connection) database.connectDb();
+        try {
+            prepare = connect.prepareStatement(sql);
+            result = prepare.executeQuery();
+
+            product prod;
+
+            while (result.next()) {
+                prod = new product(result.getInt("id"),
+                         result.getString("product_id"),
+                         result.getString("product_name"),
+                         result.getString("type"),
+                         result.getDouble("price"),
+                         result.getInt("quantity"));
+
+                listData.add(prod);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+   
+        return listData;
+    }
             
             //LETS CREATE OUR RECEIPT:
     @FXML
@@ -873,8 +935,8 @@ public class dashboardController implements Initializable {
 
         private ObservableList<product> orderData;
 
-      public void orderDisplayData() {
-          orderData = orderListdata(); // populate the list from your method
+         public void orderDisplayData() {
+          orderData = orderListData(); // populate the list from your method
 
           order_col_productID.setCellValueFactory(new PropertyValueFactory<>("product_id"));
           order_col_productName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -999,6 +1061,8 @@ public void swichForm(ActionEvent event) {
         dashboard_NC();
         dashboard_TI();
         dashboard_TIncome();
+        dashboard_NOChart();
+        dashboard_ICChart();
 
     } else if (event.getSource() == availableFD_btn) {
         dashborad_form.setVisible(false);
@@ -1106,6 +1170,9 @@ public void swichForm(ActionEvent event) {
         dashboard_NC();
         dashboard_TI();
         dashboard_TIncome();
+        
+        dashboard_NOChart();
+        dashboard_ICChart();
 
         displayUsername();
         availableFDStatus();
