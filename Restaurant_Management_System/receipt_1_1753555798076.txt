@@ -1,0 +1,16 @@
+RECEIPT
+--------------------------------
+Restaurant Management System
+Date: 2025-07-27 00:49:58
+Customer ID: 1
+--------------------------------
+Item ID    Item Name        Qty    Price    Total
+2          burger           1      $200.00  $200.00
+5          pizza 12"        1      $300.00  $300.00
+6          coffee           1      $80.00   $80.00
+--------------------------------
+Total Amount: $580.00
+Amount Paid: $0.00
+Balance: $0.00
+--------------------------------
+Thank you for your purchase!

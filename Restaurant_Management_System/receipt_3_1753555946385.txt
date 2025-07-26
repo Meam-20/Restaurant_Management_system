@@ -1,0 +1,14 @@
+RECEIPT
+--------------------------------
+Restaurant Management System
+Date: 2025-07-27 00:52:26
+Customer ID: 3
+--------------------------------
+Item ID    Item Name        Qty    Price    Total
+2          burger           1      $200.00  $200.00
+--------------------------------
+Total Amount: $200.00
+Amount Paid: $0.00
+Balance: $0.00
+--------------------------------
+Thank you for your purchase!

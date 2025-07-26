@@ -1,6 +1,6 @@
 package restaurant_management_system;
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.sql.Connection;
@@ -32,7 +32,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Button loginbtn;
     @FXML
-    private FontAwesomeIcon close;
+   // private FontAwesomeIcon close;
 
     private Connection connect;
     private PreparedStatement prepare;
